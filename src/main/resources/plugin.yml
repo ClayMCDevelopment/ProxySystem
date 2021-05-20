@@ -1,0 +1,5 @@
+name: ProxySystem
+version: 1.0.0
+author: Max_DE
+
+main: eu.claymc.proxysystem.ProxyPlugin
