@@ -96,16 +96,23 @@ public class PunishCommand extends Command implements TabExecutor {
         List<String> result = new ArrayList<>();
 
         if (args.length == 1) {
+            String arg = args[0];
             try {
                 for (SimpleCloudPlayer simpleCloudPlayer : CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers().get()) {
-                    result.add(simpleCloudPlayer.getName());
+                    if (simpleCloudPlayer.getName().startsWith(arg)) {
+                        result.add(simpleCloudPlayer.getName());
+                    }
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         } else if (args.length == 2) {
+            String arg = args[1];
             for (PunishReason value : PunishReason.values()) {
-                result.add(value.name());
+                if (value.name().startsWith(arg)) {
+                    result.add(value.name());
+
+                }
             }
         }
 
