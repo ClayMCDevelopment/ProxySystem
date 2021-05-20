@@ -34,7 +34,7 @@ public class PunishLoginListener implements Listener {
 
         try {
             IOfflineCloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(event.getConnection().getUniqueId()).get();
-            List<APunishEntry> punishEntries = this.punishManager.getPunishEntries(cloudPlayer);
+            List<APunishEntry> punishEntries = this.punishManager.getPunishCachedEntries(cloudPlayer);
 
             if (!punishEntries.isEmpty()) {
 

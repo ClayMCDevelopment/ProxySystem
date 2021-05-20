@@ -77,6 +77,8 @@ public class PunishCommand extends Command {
             }
 
             punishEntry.commit();
+            punishManager.addToCache(punishEntry.target(), punishEntry);
+            punishManager.addToCache(punishEntry.punisher(), punishEntry);
 
 
         }

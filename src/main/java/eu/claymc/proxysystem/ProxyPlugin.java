@@ -4,6 +4,8 @@ import eu.claymc.proxysystem.command.PunishCommand;
 import eu.claymc.proxysystem.command.TeamChatCommand;
 import eu.claymc.proxysystem.database.IDatabase;
 import eu.claymc.proxysystem.database.SQLDatabase;
+import eu.claymc.proxysystem.listener.PunishChatListener;
+import eu.claymc.proxysystem.listener.PunishLeaveListener;
 import eu.claymc.proxysystem.listener.PunishLoginListener;
 import eu.claymc.proxysystem.notifier.ANotifierManager;
 import eu.claymc.proxysystem.notifier.PermissionBasedNotifierManager;
@@ -32,6 +34,8 @@ public class ProxyPlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new PunishCommand(punishManager));
 
         getProxy().getPluginManager().registerListener(this, new PunishLoginListener(punishManager, this));
+        getProxy().getPluginManager().registerListener(this, new PunishChatListener(punishManager));
+        getProxy().getPluginManager().registerListener(this, new PunishLeaveListener(punishManager));
 
 
     }

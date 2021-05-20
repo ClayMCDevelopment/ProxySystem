@@ -14,13 +14,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 public class SQLPunishManager implements IPunishManager {
 
     private IDatabase<Connection> database;
     private ANotifierManager punishNotifier;
+
+    private Map<IOfflineCloudPlayer, List<APunishEntry>> punishListCache = new ConcurrentHashMap<>();
 
     public SQLPunishManager(IDatabase<Connection> database, ANotifierManager punishNotifier) {
         this.database = database;
@@ -31,6 +35,7 @@ public class SQLPunishManager implements IPunishManager {
     public SQLPunishEntry createEntry() {
         return new SQLPunishEntry(database, punishNotifier);
     }
+
 
     @Override
     public List<APunishEntry> getPunishEntries(IOfflineCloudPlayer cloudPlayer) {
@@ -65,5 +70,31 @@ public class SQLPunishManager implements IPunishManager {
         }
 
         return list;
+    }
+
+    @Override
+    public List<APunishEntry> getPunishCachedEntries(IOfflineCloudPlayer cloudPlayer) {
+        if (!punishListCache.containsKey(cloudPlayer)) {
+            punishListCache.put(cloudPlayer, getPunishEntries(cloudPlayer));
+            return getPunishCachedEntries(cloudPlayer);
+        } else {
+            return punishListCache.get(cloudPlayer);
+        }
+    }
+
+    @Override
+    public void clearCache(IOfflineCloudPlayer cloudPlayer) {
+        punishListCache.remove(cloudPlayer);
+    }
+
+    @Override
+    public void addToCache(IOfflineCloudPlayer cloudPlayer, APunishEntry punishEntry) {
+        if (!punishListCache.containsKey(cloudPlayer)) {
+            return;
+        }
+        List<APunishEntry> aPunishEntries = punishListCache.get(cloudPlayer);
+
+        aPunishEntries.add(punishEntry);
+        punishListCache.put(cloudPlayer, aPunishEntries);
     }
 }
