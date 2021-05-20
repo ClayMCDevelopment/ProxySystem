@@ -11,8 +11,6 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class ANotifierManager {
 
-    private String prefix = "§8[§bTeamChat§8] §7";
-
     public void notify(String message) {
         System.out.println(ProxyServer.getInstance());
         ICommunicationPromise<List<SimpleCloudPlayer>> onlinePlayersPromise = CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers();
