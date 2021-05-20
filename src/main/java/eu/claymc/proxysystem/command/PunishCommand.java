@@ -5,14 +5,18 @@ import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.PunishReason;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
+import eu.thesimplecloud.api.player.SimpleCloudPlayer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
 
-public class PunishCommand extends Command {
+public class PunishCommand extends Command implements TabExecutor {
     private IPunishManager punishManager;
 
     public PunishCommand(IPunishManager punishManager) {
@@ -84,5 +88,27 @@ public class PunishCommand extends Command {
         }
 
 
+    }
+
+    @Override
+    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+
+        List<String> result = new ArrayList<>();
+
+        if (args.length == 1) {
+            try {
+                for (SimpleCloudPlayer simpleCloudPlayer : CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers().get()) {
+                    result.add(simpleCloudPlayer.getName());
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        } else if (args.length == 2) {
+            for (PunishReason value : PunishReason.values()) {
+                result.add(value.name());
+            }
+        }
+
+        return result;
     }
 }

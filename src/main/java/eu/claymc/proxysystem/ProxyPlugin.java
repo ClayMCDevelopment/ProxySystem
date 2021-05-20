@@ -34,6 +34,7 @@ public class ProxyPlugin extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new TeamChatCommand(teamChatNotifier));
         getProxy().getPluginManager().registerCommand(this, new PunishCommand(punishManager));
+
         getProxy().getPluginManager().registerCommand(this, new PingCommand());
         getProxy().getPluginManager().registerCommand(this, new JoinMeCommand());
 
