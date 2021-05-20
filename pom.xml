@@ -34,7 +34,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <finalName>GameFramework</finalName>
+                    <finalName>ProxySystem</finalName>
                     <outputDirectory>D:\SimpleCloud\templates\Proxy\plugins</outputDirectory>
                 </configuration>
             </plugin>

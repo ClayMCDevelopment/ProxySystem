@@ -1,5 +1,7 @@
 package eu.claymc.proxysystem;
 
+import eu.claymc.proxysystem.command.JoinMeCommand;
+import eu.claymc.proxysystem.command.PingCommand;
 import eu.claymc.proxysystem.command.PunishCommand;
 import eu.claymc.proxysystem.command.TeamChatCommand;
 import eu.claymc.proxysystem.database.IDatabase;
@@ -32,6 +34,8 @@ public class ProxyPlugin extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new TeamChatCommand(teamChatNotifier));
         getProxy().getPluginManager().registerCommand(this, new PunishCommand(punishManager));
+        getProxy().getPluginManager().registerCommand(this, new PingCommand());
+        getProxy().getPluginManager().registerCommand(this, new JoinMeCommand());
 
         getProxy().getPluginManager().registerListener(this, new PunishLoginListener(punishManager, this));
         getProxy().getPluginManager().registerListener(this, new PunishChatListener(punishManager));

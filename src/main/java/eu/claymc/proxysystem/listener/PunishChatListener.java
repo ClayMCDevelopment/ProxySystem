@@ -13,7 +13,7 @@ import net.md_5.bungee.event.EventHandler;
 import java.util.List;
 
 public class PunishChatListener implements Listener {
-    private IPunishManager punishManager;
+    private final IPunishManager punishManager;
 
     public PunishChatListener(IPunishManager punishManager) {
         this.punishManager = punishManager;
