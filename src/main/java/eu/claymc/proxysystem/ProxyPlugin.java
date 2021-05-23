@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProxyPlugin extends Plugin {
 
-    public static final String PREFIX = "§8[§bProxy§8] §7";
+    public static final String PREFIX = "§6•§e● ClayMC §8▎ §7";
 
     private Executor executor = Executors.newCachedThreadPool();
 

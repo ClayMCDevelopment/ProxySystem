@@ -47,7 +47,7 @@ public class ReportCommand extends Command {
                 return;
             }
 
-            sender.sendMessage(PREFIX + "Du hast den Spieler " + entry.suspect().getName() + " erfolgreich reported");
+            sender.sendMessage(PREFIX + "Du hast den Spieler §e" + entry.suspect().getName() + "§7 erfolgreich reported");
 
 
             entry.commit();

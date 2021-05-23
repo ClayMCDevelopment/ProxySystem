@@ -1,5 +1,6 @@
 package eu.claymc.proxysystem.punish.sql;
 
+import eu.claymc.proxysystem.ProxyPlugin;
 import eu.claymc.proxysystem.database.IDatabase;
 import eu.claymc.proxysystem.notifier.ANotifierManager;
 import eu.claymc.proxysystem.punish.APunishEntry;
@@ -9,6 +10,8 @@ import eu.thesimplecloud.api.CloudAPI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 public class SQLPunishEntry extends APunishEntry {
@@ -33,9 +36,13 @@ public class SQLPunishEntry extends APunishEntry {
 
             pstmt.execute();
 
-            punishNotifier.notify("§8[§bPunish§8]§7 Der Spieler §c" + target().getName() + "§7 wurde wegen §c" + reason() + " bestraft");
+            punishNotifier.notify(ProxyPlugin.PREFIX + " Der Spieler §e" + target().getName() + "§7 wurde wegen §e" + reason() + " bestraft");
             if (target().isOnline() && punishType().equals(PunishType.BAN)) {
-                CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(target().getUniqueId()).get().kick("§cDu wurdest " + reason() + " gebannt");
+                CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(target().getUniqueId()).get().kick(
+                        "\n§cDu wurdest vom Netzwerk gebannt" +
+                                "\n§eGrund§8: §7" + reason() + "\n\n" +
+                                "§eBan läuft ab am§8: §7" + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(timestamp() + duration())) + "\n\n" +
+                                "§aDu wurdest zu unrecht gebannt ? Stelle einen Entbannungsantrag im Forum. §ewww.claymc.eu/forum/");
             }
 
         } catch (SQLException | InterruptedException | ExecutionException throwables) {

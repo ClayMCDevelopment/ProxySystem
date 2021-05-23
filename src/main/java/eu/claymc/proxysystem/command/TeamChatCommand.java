@@ -2,6 +2,9 @@ package eu.claymc.proxysystem.command;
 
 import eu.claymc.proxysystem.ProxyPlugin;
 import eu.claymc.proxysystem.notifier.ANotifierManager;
+import eu.thesimplecloud.api.CloudAPI;
+import eu.thesimplecloud.module.permission.PermissionPool;
+import eu.thesimplecloud.module.permission.permission.Permission;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -29,9 +32,7 @@ public class TeamChatCommand extends Command {
                     s.append(arg).append(" ");
                 }
 
-                ProxiedPlayer proxiedPlayer = (ProxiedPlayer) sender;
-
-                String formattedMessage = "§8[§bTeamChat§8] §c" + sender.getName() + " §8>§7 " + s.toString();
+                String formattedMessage = "§6•§e● TeamChat §8▎ §7§e " + sender.getName() + " §8»§7 " + s.toString();
 
                 teamChatManager.notify(formattedMessage);
 
