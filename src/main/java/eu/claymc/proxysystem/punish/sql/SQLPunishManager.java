@@ -7,6 +7,7 @@ import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.PunishReason;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class SQLPunishManager implements IPunishManager {
 
@@ -29,6 +31,18 @@ public class SQLPunishManager implements IPunishManager {
     public SQLPunishManager(IDatabase<Connection> database, ANotifierManager punishNotifier) {
         this.database = database;
         this.punishNotifier = punishNotifier;
+
+        //cache cleaner
+        ProxyServer.getInstance().getScheduler().schedule(ProxyServer.getInstance().getPluginManager().getPlugin("ProxySystem"), () -> {
+
+            for (IOfflineCloudPlayer offlinePlayer : punishListCache.keySet()) {
+                if (offlinePlayer.isOnline()) {
+                    clearCache(offlinePlayer);
+                }
+            }
+
+        }, 0, 5, TimeUnit.MINUTES);
+
     }
 
     @Override
@@ -53,6 +67,7 @@ public class SQLPunishManager implements IPunishManager {
             while (resultSet.next()) {
                 APunishEntry entry = createEntry();
                 System.out.println("try to get result from: " + resultSet.getString("punisher"));
+                entry.id(resultSet.getInt("id"));
                 entry.punisher(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("punisher"))).get());
                 entry.target(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("target"))).get());
                 entry.reason(PunishReason.valueOf(resultSet.getString("reason")));
@@ -84,17 +99,28 @@ public class SQLPunishManager implements IPunishManager {
 
     @Override
     public void clearCache(IOfflineCloudPlayer cloudPlayer) {
-        punishListCache.remove(cloudPlayer);
+        for (IOfflineCloudPlayer iOfflineCloudPlayer : punishListCache.keySet()) {
+            if (iOfflineCloudPlayer.getName().equals(cloudPlayer.getName())) {
+                punishListCache.remove(iOfflineCloudPlayer);
+                return;
+            }
+        }
     }
 
     @Override
-    public void addToCache(IOfflineCloudPlayer cloudPlayer, APunishEntry punishEntry) {
-        if (!punishListCache.containsKey(cloudPlayer)) {
-            return;
-        }
-        List<APunishEntry> aPunishEntries = punishListCache.get(cloudPlayer);
+    public void addToCache(IOfflineCloudPlayer in, APunishEntry punishEntry) {
 
-        aPunishEntries.add(punishEntry);
-        punishListCache.put(cloudPlayer, aPunishEntries);
+        for (IOfflineCloudPlayer iOfflineCloudPlayer : punishListCache.keySet()) {
+            if(iOfflineCloudPlayer.getName().equals(in.getName())){
+                List<APunishEntry> aPunishEntries = punishListCache.get(iOfflineCloudPlayer);
+
+                aPunishEntries.add(punishEntry);
+                punishListCache.put(iOfflineCloudPlayer, aPunishEntries);
+                System.out.println("entry added to cache");
+
+            }
+        }
+
+
     }
 }

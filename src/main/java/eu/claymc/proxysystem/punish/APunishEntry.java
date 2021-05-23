@@ -4,7 +4,7 @@ import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 
 public abstract class APunishEntry {
 
-
+    private int id = -1;
     private PunishType punishType;
 
     private IOfflineCloudPlayer target;
@@ -13,6 +13,11 @@ public abstract class APunishEntry {
     private PunishReason reason;
     private long timestamp;
     private long duration;
+
+    public APunishEntry id(int id) {
+        this.id = id;
+        return this;
+    }
 
     public APunishEntry type(PunishType punishType) {
         this.punishType = punishType;
@@ -44,6 +49,9 @@ public abstract class APunishEntry {
         return this;
     }
 
+    public int id() {
+        return this.id;
+    }
 
     public PunishType punishType() {
         return this.punishType;

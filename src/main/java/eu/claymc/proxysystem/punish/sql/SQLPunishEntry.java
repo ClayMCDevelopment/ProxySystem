@@ -54,6 +54,17 @@ public class SQLPunishEntry extends APunishEntry {
 
     @Override
     public void update() {
-        //TODO implement
+        if (id() == -1) {
+            throw new IllegalStateException("Punishentry does not exists! First commit before updating!");
+        }
+
+        try (Connection connection = database.getConnection(); PreparedStatement pstmt = connection.prepareStatement("UPDATE punishes SET duration=? WHERE id=?")) {
+            pstmt.setLong(1, duration());
+            pstmt.setInt(2, id());
+            pstmt.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 }

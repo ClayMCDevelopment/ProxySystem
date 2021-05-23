@@ -1,5 +1,6 @@
 package eu.claymc.proxysystem.command;
 
+import eu.claymc.proxysystem.ProxyPlugin;
 import eu.claymc.proxysystem.punish.APunishEntry;
 import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.PunishReason;
@@ -36,7 +37,7 @@ public class PunishCommand extends Command implements TabExecutor {
             sender.sendMessage(PREFIX + "§c/punish <target> <reason> [info]");
             sender.sendMessage(PREFIX + "§c/Reasons: ");
             for (PunishReason reason : PunishReason.values()) {
-                sender.sendMessage(PREFIX + " §8 > §7" + reason.name());
+                sender.sendMessage(PREFIX + " §8§l > §e" + reason.name());
             }
         }
         if (args.length >= 2) {
@@ -74,15 +75,16 @@ public class PunishCommand extends Command implements TabExecutor {
 
             try {
                 punishEntry.punisher(CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(sender.getName()).get());
-
             } catch (InterruptedException | ExecutionException e) {
                 sender.sendMessage("§4§lUps. Da ist was schief gelaufen. Bitte wende dich an einen Developer/Admin");
                 return;
             }
 
-            punishEntry.commit();
-            punishManager.addToCache(punishEntry.target(), punishEntry);
-            punishManager.addToCache(punishEntry.punisher(), punishEntry);
+            ProxyPlugin.execute(() -> {
+                punishEntry.commit();
+                punishManager.addToCache(punishEntry.target(), punishEntry);
+                punishManager.addToCache(punishEntry.punisher(), punishEntry);
+            });
 
 
         }

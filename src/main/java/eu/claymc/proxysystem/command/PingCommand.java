@@ -15,7 +15,7 @@ public class PingCommand extends Command {
     public void execute(CommandSender commandSender, String[] strings) {
 
         ProxiedPlayer proxiedPlayer = (ProxiedPlayer) commandSender;
-        proxiedPlayer.sendMessage(ProxyPlugin.PREFIX + "PONG! Dein Ping: §b" + proxiedPlayer.getPing() + "ms ");
+        proxiedPlayer.sendMessage(ProxyPlugin.PREFIX + "PONG! Dein Ping: §e" + proxiedPlayer.getPing() + "ms ");
 
     }
 }

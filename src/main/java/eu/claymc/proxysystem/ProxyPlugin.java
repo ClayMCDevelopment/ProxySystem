@@ -12,11 +12,14 @@ import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.sql.SQLPunishManager;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.claymc.proxysystem.report.sql.SQLReportManager;
+import eu.thesimplecloud.api.CloudAPI;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +28,11 @@ public class ProxyPlugin extends Plugin {
 
     public static final String PREFIX = "§6•§e● ClayMC §8▎ §7";
 
-    private Executor executor = Executors.newCachedThreadPool();
+    private static Executor executor = Executors.newCachedThreadPool();
+
+    public static void execute(Runnable runnable) {
+        executor.execute(runnable);
+    }
 
 
     @Override
@@ -42,7 +49,10 @@ public class ProxyPlugin extends Plugin {
         IReportManager reportManager = new SQLReportManager(database, punishNotifier);
 
         getProxy().getPluginManager().registerCommand(this, new TeamChatCommand(teamChatNotifier));
+
         getProxy().getPluginManager().registerCommand(this, new PunishCommand(punishManager));
+        getProxy().getPluginManager().registerCommand(this, new ForgiveCommand(punishManager));
+
         getProxy().getPluginManager().registerCommand(this, new ReportCommand(reportManager));
 
         getProxy().getPluginManager().registerCommand(this, new PingCommand());
@@ -52,7 +62,7 @@ public class ProxyPlugin extends Plugin {
         getProxy().getPluginManager().registerListener(this, new PunishChatListener(punishManager));
         getProxy().getPluginManager().registerListener(this, new PunishLeaveListener(punishManager));
 
-
+        //auto close reports
         getProxy().getScheduler().schedule(this, () -> executor.execute(() -> {
 
             try (Connection connection = database.getConnection();
