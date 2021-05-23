@@ -12,9 +12,9 @@ public class SQLDatabase implements IDatabase<Connection> {
     @Override
     public void connect() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/claymc");
-        config.setUsername("root");
-        config.setPassword("");
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/ClayMCServer");
+        config.setUsername("admin");
+        config.setPassword("3fUWO2O1XKSY5oPuJ9d4w87IEWnVa6Y0");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
