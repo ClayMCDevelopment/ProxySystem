@@ -6,7 +6,7 @@ public abstract class AReportEntry {
 
     private int reportId;
     private int priority;
-    private boolean closed;
+    private int status;
 
     private IOfflineCloudPlayer reporter;
     private IOfflineCloudPlayer suspect;
@@ -20,7 +20,7 @@ public abstract class AReportEntry {
         return this;
     }
 
-    public AReportEntry priority(int priority){
+    public AReportEntry priority(int priority) {
         this.priority = priority;
         return this;
     }
@@ -45,8 +45,8 @@ public abstract class AReportEntry {
         return this;
     }
 
-    public AReportEntry closed(boolean closed){
-        this.closed = closed;
+    public AReportEntry status(int closed) {
+        this.status = closed;
         return this;
     }
 
@@ -56,7 +56,7 @@ public abstract class AReportEntry {
     }
 
 
-    public int priority(){
+    public int priority() {
         return this.priority;
     }
 
@@ -76,8 +76,8 @@ public abstract class AReportEntry {
         return this.timestamp;
     }
 
-    public boolean closed(){
-        return this.closed;
+    public int status() {
+        return this.status;
     }
 
     public abstract void commit();

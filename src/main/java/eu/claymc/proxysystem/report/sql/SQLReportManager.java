@@ -42,7 +42,7 @@ public class SQLReportManager implements IReportManager {
 
             while (resultSet.next()) {
 
-                boolean closed = resultSet.getBoolean("closed");
+                int status = resultSet.getInt("status");
                 int priority = resultSet.getInt("priority");
                 UUID reporterUUID = UUID.fromString(resultSet.getString("reporter"));
                 UUID suspectUUID = UUID.fromString(resultSet.getString("suspect"));
@@ -50,7 +50,7 @@ public class SQLReportManager implements IReportManager {
                 long timestamp = resultSet.getLong("timestamp");
 
                 AReportEntry entry = createEntry();
-                entry.closed(closed);
+                entry.status(status);
                 entry.priority(priority);
                 entry.reporter(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(reporterUUID).get());
                 entry.suspect(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(suspectUUID).get());
@@ -80,7 +80,7 @@ public class SQLReportManager implements IReportManager {
 
             while (resultSet.next()) {
 
-                boolean closed = resultSet.getBoolean("closed");
+                int closed = resultSet.getInt("status");
                 int priority = resultSet.getInt("priority");
                 UUID reporterUUID = UUID.fromString(resultSet.getString("reporter"));
                 UUID suspectUUID = UUID.fromString(resultSet.getString("suspect"));
@@ -89,7 +89,7 @@ public class SQLReportManager implements IReportManager {
 
                 AReportEntry entry = createEntry();
                 entry.priority(priority);
-                entry.closed(closed);
+                entry.status(closed);
                 entry.reporter(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(reporterUUID).get());
                 entry.suspect(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(suspectUUID).get());
                 entry.reason(reason);

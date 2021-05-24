@@ -67,7 +67,7 @@ public class ProxyPlugin extends Plugin {
 
             try (Connection connection = database.getConnection();
                  PreparedStatement pstmt =
-                         connection.prepareStatement("UPDATE reports SET closed=1 WHERE timestamp <= ? AND closed=0")) {
+                         connection.prepareStatement("UPDATE reports SET closed=3 WHERE timestamp <= ? AND closed=0")) {
 
                 pstmt.setLong(1, System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(30));
                 pstmt.execute();

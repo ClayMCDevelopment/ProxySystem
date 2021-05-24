@@ -8,6 +8,7 @@ import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
@@ -22,9 +23,9 @@ public class ReportCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if(args.length == 0){
+        if (args.length == 0) {
             sender.sendMessage(ProxyPlugin.PREFIX + "§c/report <target> <reason>");
-        }else if(args.length == 2){
+        } else if (args.length == 2) {
             String targetName = args[0];
             String reason = args[1];
 
@@ -51,6 +52,34 @@ public class ReportCommand extends Command {
 
 
             entry.commit();
+
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
+            ProxyPlugin.execute(() -> {
+
+                List<AReportEntry> allReports = reportManager.getAllReports();
+
+                int openReports = 0;
+                int approved = 0;
+                int disapproved = 0;
+                int autoClosed = 0;
+
+                for (AReportEntry allReport : allReports) {
+                    if (allReport.status() == 0) {
+                        openReports++;
+                    } else if (allReport.status() == 1) {
+                        approved++;
+                    } else if (allReport.status() == 2) {
+                        disapproved++;
+                    } else if (allReport.status() == 3) {
+                        autoClosed++;
+                    }
+                }
+
+                sender.sendMessage(PREFIX + "Reports§8: §c" + openReports + "§8/§a" + (approved + disapproved + autoClosed));
+                sender.sendMessage(PREFIX + "Approved Reports§8: §a" + approved);
+                sender.sendMessage(PREFIX + "Disapproved Reports§8: §a" + disapproved);
+                sender.sendMessage(PREFIX + "Autoclosed Reports§8: §a" + autoClosed);
+            });
 
         }
     }
