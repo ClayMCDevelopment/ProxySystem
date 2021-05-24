@@ -68,8 +68,9 @@ public class ForgiveCommand extends Command implements TabExecutor {
                             sender.sendMessage(PREFIX + "Dem Spieler §e" + targetPlayer.getName() + "§7 wurde §e#" + punishEntry.id() + " §7vergeben");
 
 
-                            found.set(true);
                         });
+                        found.set(true);
+
                     }
 
 
