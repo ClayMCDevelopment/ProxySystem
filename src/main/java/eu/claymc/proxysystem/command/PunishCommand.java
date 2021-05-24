@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
 
 public class PunishCommand extends Command implements TabExecutor {
+
     private IPunishManager punishManager;
 
     public PunishCommand(IPunishManager punishManager) {

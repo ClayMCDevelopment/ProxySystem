@@ -13,7 +13,6 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
 
@@ -53,7 +52,7 @@ public class ForgiveCommand extends Command implements TabExecutor {
                 return;
             }
 
-            AtomicBoolean found = new AtomicBoolean(false);
+            boolean found = false;
             for (APunishEntry punishEntry : punishEntries) {
                 //filter where punish target is the target player
                 if (punishEntry.target().getName().equals(targetPlayer.getName())) {
@@ -69,7 +68,7 @@ public class ForgiveCommand extends Command implements TabExecutor {
 
 
                         });
-                        found.set(true);
+                        found = true;
 
                     }
 
@@ -79,7 +78,7 @@ public class ForgiveCommand extends Command implements TabExecutor {
             }
 
 
-            if (!found.get()) {
+            if (!found) {
                 sender.sendMessage(PREFIX + " Der Spieler §e " + targetPlayer.getName() + "§7 hat keine aktive Strafe");
             } else {
                 punishManager.clearCache(targetPlayer);
