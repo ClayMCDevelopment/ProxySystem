@@ -33,6 +33,7 @@ public class PunishChatListener implements Listener {
                     event.setMessage(null);
                     proxiedPlayer.sendMessage(ProxyPlugin.PREFIX + "§cDu bist aus dem Chat ausgeschlossen. (" + punishEntry.reason() + ")");
                     event.setCancelled(true);
+                    return;
                 }
             }
 

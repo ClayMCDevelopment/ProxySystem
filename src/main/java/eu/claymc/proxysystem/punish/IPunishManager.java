@@ -12,6 +12,8 @@ public interface IPunishManager {
 
     List<APunishEntry> getPunishCachedEntries(IOfflineCloudPlayer cloudPlayer);
 
+    List<APunishEntry> getAllPunishEntries();
+
     void clearCache(IOfflineCloudPlayer cloudPlayer);
 
     void addToCache(IOfflineCloudPlayer cloudPlayer, APunishEntry punishEntry);

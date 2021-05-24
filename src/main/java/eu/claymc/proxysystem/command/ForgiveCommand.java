@@ -3,18 +3,21 @@ package eu.claymc.proxysystem.command;
 import eu.claymc.proxysystem.ProxyPlugin;
 import eu.claymc.proxysystem.punish.APunishEntry;
 import eu.claymc.proxysystem.punish.IPunishManager;
+import eu.claymc.proxysystem.punish.PunishReason;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
 
-public class ForgiveCommand extends Command {
+public class ForgiveCommand extends Command implements TabExecutor {
     private IPunishManager punishManager;
 
     public ForgiveCommand(IPunishManager punishManager) {
@@ -84,5 +87,37 @@ public class ForgiveCommand extends Command {
         }
 
 
+    }
+
+    @Override
+    public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+
+        List<String> result = new ArrayList<>();
+
+        if (args.length == 1) {
+            String arg = args[0];
+
+            List<APunishEntry> entries = punishManager.getAllPunishEntries();
+
+            for (APunishEntry entry : entries) {
+                if (entry.timestamp() + entry.duration() > System.currentTimeMillis()) {
+                    if (entry.target().getName().toLowerCase().startsWith(arg.toLowerCase())) {
+                        result.add(entry.target().getName());
+                    }
+                }
+
+            }
+
+        } else if (args.length == 2) {
+            String arg = args[1];
+            for (PunishReason value : PunishReason.values()) {
+                if (value.name().startsWith(arg)) {
+                    result.add(value.name());
+
+                }
+            }
+        }
+
+        return result;
     }
 }

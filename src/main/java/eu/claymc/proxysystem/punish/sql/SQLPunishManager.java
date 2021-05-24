@@ -53,8 +53,6 @@ public class SQLPunishManager implements IPunishManager {
 
     @Override
     public List<APunishEntry> getPunishEntries(IOfflineCloudPlayer cloudPlayer) {
-        //TODO implement
-
         List<APunishEntry> list = new ArrayList<>();
 
         try (Connection connection = database.getConnection(); PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM punishes WHERE punisher=? OR target=?")) {
@@ -95,6 +93,35 @@ public class SQLPunishManager implements IPunishManager {
         } else {
             return punishListCache.get(cloudPlayer);
         }
+    }
+
+    @Override
+    public List<APunishEntry> getAllPunishEntries() {
+        List<APunishEntry> list = new ArrayList<>();
+
+        try (Connection connection = database.getConnection(); PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM punishes")) {
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                APunishEntry entry = createEntry();
+                entry.id(resultSet.getInt("id"));
+                entry.punisher(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("punisher"))).get());
+                entry.target(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("target"))).get());
+                entry.reason(PunishReason.valueOf(resultSet.getString("reason")));
+                entry.type(entry.reason().getType());
+                entry.timestamp(resultSet.getLong("timestamp"));
+                entry.duration(resultSet.getLong("duration"));
+
+                list.add(entry);
+
+            }
+
+        } catch (SQLException | InterruptedException | ExecutionException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return list;
     }
 
     @Override

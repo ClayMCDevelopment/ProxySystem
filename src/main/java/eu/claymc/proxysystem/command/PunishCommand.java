@@ -100,8 +100,9 @@ public class PunishCommand extends Command implements TabExecutor {
         if (args.length == 1) {
             String arg = args[0];
             try {
-                for (SimpleCloudPlayer simpleCloudPlayer : CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers().get()) {
-                    if (simpleCloudPlayer.getName().startsWith(arg)) {
+                List<SimpleCloudPlayer> simpleCloudPlayers = CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers().get();
+                for (SimpleCloudPlayer simpleCloudPlayer : simpleCloudPlayers) {
+                    if (simpleCloudPlayer.getName().toLowerCase().startsWith(arg.toLowerCase())) {
                         result.add(simpleCloudPlayer.getName());
                     }
                 }
