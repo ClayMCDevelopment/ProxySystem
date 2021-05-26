@@ -1,6 +1,8 @@
 package eu.claymc.proxysystem.command;
 
 import eu.claymc.proxysystem.ProxyPlugin;
+import eu.claymc.proxysystem.notifier.ANotifierManager;
+import eu.claymc.proxysystem.punish.PunishReason;
 import eu.claymc.proxysystem.report.AReportEntry;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.thesimplecloud.api.CloudAPI;
@@ -15,10 +17,12 @@ import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
 
 public class ReportCommand extends Command {
     private IReportManager reportManager;
+    private ANotifierManager reportNotifier;
 
-    public ReportCommand(IReportManager reportManager) {
+    public ReportCommand(IReportManager reportManager, ANotifierManager reportNotifier) {
         super("report");
         this.reportManager = reportManager;
+        this.reportNotifier = reportNotifier;
     }
 
     @Override
@@ -26,32 +30,44 @@ public class ReportCommand extends Command {
         if (args.length == 0) {
             sender.sendMessage(ProxyPlugin.PREFIX + "§c/report <target> <reason>");
         } else if (args.length == 2) {
-            String targetName = args[0];
-            String reason = args[1];
 
-            AReportEntry entry = reportManager.createEntry();
-            entry.timestamp(System.currentTimeMillis());
-            entry.reason(reason);
-            try {
-                IOfflineCloudPlayer suspectCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(targetName).get();
-                entry.suspect(suspectCloudPlayer);
-            } catch (InterruptedException | ExecutionException e) {
-                sender.sendMessage(PREFIX + "§cDer Spieler \"" + targetName + "\" ist dem Netzwerk nicht bekannt! ");
-                return;
-            }
+            ProxyPlugin.execute(() -> {
 
-            try {
-                IOfflineCloudPlayer reporterCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(sender.getName()).get();
-                entry.reporter(reporterCloudPlayer);
-            } catch (InterruptedException | ExecutionException e) {
-                sender.sendMessage(PREFIX + "§cDer Spieler \"" + targetName + "\" ist dem Netzwerk nicht bekannt! ");
-                return;
-            }
+                String targetName = args[0];
 
-            sender.sendMessage(PREFIX + "Du hast den Spieler §e" + entry.suspect().getName() + "§7 erfolgreich reported");
+                String reason = args[0];
+                try {
+                    PunishReason.valueOf(args[1].toUpperCase());
+                } catch (Exception e) {
+                    sender.sendMessage(PREFIX + "Der Grund wurde nicht gefunden! Bitte überprüfe deine Eingabe");
+                    return;
+                }
+
+                AReportEntry entry = reportManager.createEntry();
+                entry.timestamp(System.currentTimeMillis());
+                entry.reason(reason);
+                try {
+                    IOfflineCloudPlayer suspectCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(targetName).get();
+                    entry.suspect(suspectCloudPlayer);
+                } catch (InterruptedException | ExecutionException e) {
+                    sender.sendMessage(PREFIX + "§cDer Spieler \"" + targetName + "\" ist dem Netzwerk nicht bekannt! ");
+                    return;
+                }
+
+                try {
+                    IOfflineCloudPlayer reporterCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(sender.getName()).get();
+                    entry.reporter(reporterCloudPlayer);
+                } catch (InterruptedException | ExecutionException e) {
+                    sender.sendMessage(PREFIX + "§cDer Spieler \"" + targetName + "\" ist dem Netzwerk nicht bekannt! ");
+                    return;
+                }
+
+                sender.sendMessage(PREFIX + "Du hast den Spieler §e" + entry.suspect().getName() + "§7 erfolgreich reported");
+                reportNotifier.notify(PREFIX + "Der Spieler §e" + entry.suspect().getName() + " §7wurde reportet!");
 
 
-            entry.commit();
+                entry.commit();
+            });
 
         } else if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
             ProxyPlugin.execute(() -> {

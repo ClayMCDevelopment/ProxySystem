@@ -11,7 +11,7 @@ public class PermissionBasedNotifierManager extends ANotifierManager {
     }
 
     @Override
-    public boolean canReceiveTeamMessage(ICloudPlayer cloudPlayer) {
+    public boolean canReceiveMessage(ICloudPlayer cloudPlayer) {
         return cloudPlayer.hasPermissionSync(permission);
     }
 }

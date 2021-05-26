@@ -12,14 +12,11 @@ import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.sql.SQLPunishManager;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.claymc.proxysystem.report.sql.SQLReportManager;
-import eu.thesimplecloud.api.CloudAPI;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +40,8 @@ public class ProxyPlugin extends Plugin {
 
         ANotifierManager teamChatNotifier = new PermissionBasedNotifierManager("claymc.teamchat");
         ANotifierManager punishNotifier = new PermissionBasedNotifierManager("claymc.punish.notification");
+        ANotifierManager reportNotifier = new PermissionBasedNotifierManager("claymc.report.notification");
+
 
         IPunishManager punishManager = new SQLPunishManager(database, punishNotifier);
 
@@ -50,10 +49,12 @@ public class ProxyPlugin extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new TeamChatCommand(teamChatNotifier));
 
+        getProxy().getPluginManager().registerCommand(this, new WhereAmICommand());
+
         getProxy().getPluginManager().registerCommand(this, new PunishCommand(punishManager));
         getProxy().getPluginManager().registerCommand(this, new ForgiveCommand(punishManager));
 
-        getProxy().getPluginManager().registerCommand(this, new ReportCommand(reportManager));
+        getProxy().getPluginManager().registerCommand(this, new ReportCommand(reportManager, reportNotifier));
 
         getProxy().getPluginManager().registerCommand(this, new PingCommand());
         getProxy().getPluginManager().registerCommand(this, new JoinMeCommand());
@@ -67,7 +68,7 @@ public class ProxyPlugin extends Plugin {
 
             try (Connection connection = database.getConnection();
                  PreparedStatement pstmt =
-                         connection.prepareStatement("UPDATE reports SET closed=3 WHERE timestamp <= ? AND closed=0")) {
+                         connection.prepareStatement("UPDATE reports SET status=3 WHERE timestamp <= ? AND status=0")) {
 
                 pstmt.setLong(1, System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(30));
                 pstmt.execute();

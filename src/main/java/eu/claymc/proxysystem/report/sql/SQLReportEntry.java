@@ -33,4 +33,9 @@ public class SQLReportEntry extends AReportEntry {
             throwables.printStackTrace();
         }
     }
+
+    @Override
+    public void update() {
+        //TODO update priority and status!
+    }
 }

@@ -42,6 +42,7 @@ public class SQLReportManager implements IReportManager {
 
             while (resultSet.next()) {
 
+                int id = resultSet.getInt("id");
                 int status = resultSet.getInt("status");
                 int priority = resultSet.getInt("priority");
                 UUID reporterUUID = UUID.fromString(resultSet.getString("reporter"));
@@ -50,6 +51,7 @@ public class SQLReportManager implements IReportManager {
                 long timestamp = resultSet.getLong("timestamp");
 
                 AReportEntry entry = createEntry();
+                entry.reportId(id);
                 entry.status(status);
                 entry.priority(priority);
                 entry.reporter(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(reporterUUID).get());

@@ -82,5 +82,7 @@ public abstract class AReportEntry {
 
     public abstract void commit();
 
+    public abstract void update();
+
 
 }

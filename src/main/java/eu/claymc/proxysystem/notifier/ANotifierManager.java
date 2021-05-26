@@ -16,13 +16,12 @@ public abstract class ANotifierManager {
         ICommunicationPromise<List<SimpleCloudPlayer>> onlinePlayersPromise = CloudAPI.getInstance().getCloudPlayerManager().getAllOnlinePlayers();
         try {
 
-
             List<SimpleCloudPlayer> simpleCloudPlayers = onlinePlayersPromise.get();
 
             for (SimpleCloudPlayer simpleCloudPlayer : simpleCloudPlayers) {
                 ICommunicationPromise<ICloudPlayer> cloudPlayerPromise = simpleCloudPlayer.getCloudPlayer();
                 ICloudPlayer cloudPlayer = cloudPlayerPromise.get();
-                if (canReceiveTeamMessage(cloudPlayer)) {
+                if (canReceiveMessage(cloudPlayer)) {
                     cloudPlayer.sendMessage(message);
                 }
             }
@@ -34,7 +33,7 @@ public abstract class ANotifierManager {
 
     }
 
-    public abstract boolean canReceiveTeamMessage(ICloudPlayer cloudPlayer);
+    public abstract boolean canReceiveMessage(ICloudPlayer cloudPlayer);
 
 
 }
