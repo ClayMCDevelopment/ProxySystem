@@ -21,7 +21,9 @@ public class PunishChatListener implements Listener {
 
     @EventHandler
     public void handle(ChatEvent event) {
-
+        if(event.getMessage().startsWith("/")){
+            return;
+        }
         ProxiedPlayer proxiedPlayer = (ProxiedPlayer) event.getSender();
         ICloudPlayer cloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getCachedCloudPlayer(proxiedPlayer.getUniqueId());
 

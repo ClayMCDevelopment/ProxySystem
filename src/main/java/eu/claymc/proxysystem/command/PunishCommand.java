@@ -13,6 +13,7 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import static eu.claymc.proxysystem.ProxyPlugin.PREFIX;
@@ -35,7 +36,7 @@ public class PunishCommand extends Command implements TabExecutor {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(PREFIX + "§c/punish <target> <reason> [info]");
+            sender.sendMessage(PREFIX + "§c/punish <target> <reason>");
             sender.sendMessage(PREFIX + "§c/Reasons: ");
             for (PunishReason reason : PunishReason.values()) {
                 sender.sendMessage(PREFIX + " §8§l > §e" + reason.name());
@@ -56,18 +57,14 @@ public class PunishCommand extends Command implements TabExecutor {
 
             punishEntry.type(reason.getType());
 
-            String info = "";
-
-            for (int i = 2; i < args.length; i++) {
-                info += args[i] + " ";
-            }
 
             punishEntry.reason(reason);
             punishEntry.timestamp(System.currentTimeMillis());
             punishEntry.duration(reason.getDuration());
 
+            IOfflineCloudPlayer targetCloudPlayer;
             try {
-                IOfflineCloudPlayer targetCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(targetName).get();
+                targetCloudPlayer = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(targetName).get();
                 punishEntry.target(targetCloudPlayer);
             } catch (InterruptedException | ExecutionException e) {
                 sender.sendMessage(PREFIX + "§cDer Spieler \"" + targetName + "\" ist dem Netzwerk nicht bekannt! ");
@@ -83,8 +80,12 @@ public class PunishCommand extends Command implements TabExecutor {
 
             ProxyPlugin.execute(() -> {
                 punishEntry.commit();
-                punishManager.addToCache(punishEntry.target(), punishEntry);
-                punishManager.addToCache(punishEntry.punisher(), punishEntry);
+
+                if (targetCloudPlayer.isOnline()) {
+                    CloudAPI.getInstance().getMessageChannelManager().getMessageChannelByName("punish-cache-update").sendMessage(targetCloudPlayer.getUniqueId().toString(), Objects.requireNonNull(CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(targetCloudPlayer.getUniqueId()).getBlocking().getConnectedProxy()));
+                    CloudAPI.getInstance().getMessageChannelManager().getMessageChannelByName("punish-cache-update").sendMessage(punishEntry.punisher().getUniqueId().toString(), Objects.requireNonNull(CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(targetCloudPlayer.getUniqueId()).getBlocking().getConnectedProxy()));
+                }
+
             });
 
 

@@ -64,7 +64,6 @@ public class SQLPunishManager implements IPunishManager {
 
             while (resultSet.next()) {
                 APunishEntry entry = createEntry();
-                System.out.println("try to get result from: " + resultSet.getString("punisher"));
                 entry.id(resultSet.getInt("id"));
                 entry.punisher(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("punisher"))).get());
                 entry.target(CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(resultSet.getString("target"))).get());

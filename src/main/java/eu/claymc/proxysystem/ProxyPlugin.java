@@ -12,11 +12,16 @@ import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.sql.SQLPunishManager;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.claymc.proxysystem.report.sql.SQLReportManager;
+import eu.thesimplecloud.api.CloudAPI;
+import eu.thesimplecloud.api.message.IMessageChannel;
+import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +83,20 @@ public class ProxyPlugin extends Plugin {
             }
 
         }), 1, 30, TimeUnit.SECONDS);
+
+        IMessageChannel<String> messageChannel = CloudAPI.getInstance().getMessageChannelManager().registerMessageChannel(CloudAPI.getInstance().getThisSidesCloudModule(), "punish-cache-update", String.class);
+
+        messageChannel.registerListener((s, iNetworkComponent) -> {
+
+            try {
+                System.out.println("messageing channel clear cache listener!");
+                IOfflineCloudPlayer target = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(s)).get();
+                punishManager.clearCache(target);
+                punishManager.getPunishCachedEntries(target);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
 
     }
 }
