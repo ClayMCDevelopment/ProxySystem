@@ -30,7 +30,7 @@ public class ProxyPlugin extends Plugin {
 
     public static final String PREFIX = "§6•§e● ClayMC §8▎ §7";
 
-    private static Executor executor = Executors.newCachedThreadPool();
+    private final static Executor executor = Executors.newCachedThreadPool();
 
     public static void execute(Runnable runnable) {
         executor.execute(runnable);
