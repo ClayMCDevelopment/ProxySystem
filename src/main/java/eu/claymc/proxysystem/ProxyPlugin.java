@@ -64,9 +64,13 @@ public class ProxyPlugin extends Plugin {
         getProxy().getPluginManager().registerCommand(this, new PingCommand());
         getProxy().getPluginManager().registerCommand(this, new JoinMeCommand());
 
-        getProxy().getPluginManager().registerListener(this, new PunishLoginListener(punishManager, this));
+        getProxy().getPluginManager().registerListener(this, new PunishLoginListener(punishManager, this, database));
         getProxy().getPluginManager().registerListener(this, new PunishChatListener(punishManager));
         getProxy().getPluginManager().registerListener(this, new PunishLeaveListener(punishManager));
+
+        getProxy().getPluginManager().registerCommand(this, new PInfoCommand(punishManager, database));
+
+
 
         //auto close reports
         getProxy().getScheduler().schedule(this, () -> executor.execute(() -> {
