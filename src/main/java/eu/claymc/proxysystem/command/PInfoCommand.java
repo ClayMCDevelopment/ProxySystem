@@ -3,6 +3,8 @@ package eu.claymc.proxysystem.command;
 import eu.claymc.proxysystem.database.IDatabase;
 import eu.claymc.proxysystem.punish.APunishEntry;
 import eu.claymc.proxysystem.punish.IPunishManager;
+import eu.claymc.proxysystem.punish.PunishType;
+import eu.claymc.proxysystem.util.TimeUtil;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.CommandSender;
@@ -61,7 +63,6 @@ public class PInfoCommand extends Command {
                 }
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             try {
                 sender.sendMessage(PREFIX + "Status§8: " + (targetCloudPlayer.isOnline() ? "§a§lOnline §8(§e" +
                         CloudAPI.getInstance().getCloudPlayerManager().getCloudPlayer(targetCloudPlayer.getUniqueId()).get().getConnectedServer().getName() + "§8)"
@@ -72,12 +73,12 @@ public class PInfoCommand extends Command {
                 e.printStackTrace();
             }
 
-            TextComponent hoverPunishment = new TextComponent(PREFIX + "Active Punishment§8: " + (activePunishEntry == null ? "§a§lNo" : "§c§lYes"));
+            TextComponent hoverPunishment = new TextComponent(PREFIX + "Active Punishment§8: " + (activePunishEntry == null ? "§a§lNo" : (activePunishEntry.reason().getType() == PunishType.BAN ? "§c" : "§6") + "§lYes"));
             if (activePunishEntry != null) {
                 String hoverText = PREFIX + "Punish Reason§8: §e" + activePunishEntry.reason() + "\n" +
                         PREFIX + "Punish Timestamp§8: §e" + simpleDateFormat.format(new Date(activePunishEntry.timestamp())) + "\n" +
-                        PREFIX + "Punish Duration§8: §e" + timeFormat.format(new Date(activePunishEntry.duration())) + "\n" +
-                        PREFIX + "Punish expire§8: §e" + timeFormat.format(new Date(activePunishEntry.timestamp() + activePunishEntry.duration()));
+                        PREFIX + "Punish Duration§8: §e" + TimeUtil.convertString(activePunishEntry.duration()) + "\n" +
+                        PREFIX + "Punish expire§8: §e" + simpleDateFormat.format(new Date(activePunishEntry.timestamp() + activePunishEntry.duration()));
                 hoverPunishment.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
             }
 
@@ -86,12 +87,12 @@ public class PInfoCommand extends Command {
             sender.sendMessage(PREFIX + "First Login§8: §e" + simpleDateFormat.format(new Date(targetCloudPlayer.getFirstLogin())));
             sender.sendMessage(PREFIX + "Last Login§8: §e" + simpleDateFormat.format(new Date(targetCloudPlayer.getLastLogin())));
 
-            sender.sendMessage(PREFIX + "Onlinetime§8: §e" + timeFormat.format(new Date(targetCloudPlayer.getOnlineTime())));
+            sender.sendMessage(PREFIX + "Onlinetime§8: §e" + TimeUtil.convertString(targetCloudPlayer.getOnlineTime()));
 
             try (Connection connection = database.getConnection(); PreparedStatement pstmt = connection.prepareStatement("SELECT altAccount FROM multiaccounts WHERE mainAccount=?")) {
                 pstmt.setString(1, targetCloudPlayer.getUniqueId().toString());
                 ResultSet resultSet = pstmt.executeQuery();
-                sender.sendMessage(PREFIX + "MultiAccounts§8:");
+                sender.sendMessage(PREFIX + "MultiAccounts§8: §7(incomplete list)");
 
                 while (resultSet.next()) {
 

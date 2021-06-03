@@ -6,6 +6,7 @@ import eu.claymc.proxysystem.punish.APunishEntry;
 import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.PunishReason;
 import eu.thesimplecloud.api.CloudAPI;
+import eu.thesimplecloud.api.message.IMessageChannel;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
 import net.md_5.bungee.api.ProxyServer;
 
@@ -36,12 +37,28 @@ public class SQLPunishManager implements IPunishManager {
         ProxyServer.getInstance().getScheduler().schedule(ProxyServer.getInstance().getPluginManager().getPlugin("ProxySystem"), () -> {
 
             for (IOfflineCloudPlayer offlinePlayer : punishListCache.keySet()) {
-                if (offlinePlayer.isOnline()) {
+                if (!offlinePlayer.isOnline()) {
                     clearCache(offlinePlayer);
                 }
             }
 
         }, 0, 5, TimeUnit.MINUTES);
+
+
+
+        IMessageChannel<String> messageChannel = CloudAPI.getInstance().getMessageChannelManager().registerMessageChannel(CloudAPI.getInstance().getThisSidesCloudModule(), "punish-cache-update", String.class);
+
+        messageChannel.registerListener((s, iNetworkComponent) -> {
+
+            try {
+                System.out.println("messageing channel clear cache listener!");
+                IOfflineCloudPlayer target = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(s)).get();
+                clearCache(target);
+                getPunishCachedEntries(target);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
 
     }
 

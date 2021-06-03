@@ -1,11 +1,13 @@
 package eu.claymc.proxysystem.report.sql;
 
+import eu.claymc.proxysystem.ProxyPlugin;
 import eu.claymc.proxysystem.database.IDatabase;
 import eu.claymc.proxysystem.notifier.ANotifierManager;
 import eu.claymc.proxysystem.report.AReportEntry;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.thesimplecloud.api.CloudAPI;
 import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class SQLReportManager implements IReportManager {
 
@@ -24,6 +27,24 @@ public class SQLReportManager implements IReportManager {
     public SQLReportManager(IDatabase<Connection> database, ANotifierManager punishNotifier) {
         this.database = database;
         this.punishNotifier = punishNotifier;
+
+
+        //auto close reports
+        ProxyServer.getInstance().getScheduler().schedule(ProxyPlugin.getInstance(), () -> ProxyPlugin.execute(() -> {
+
+            try (Connection connection = database.getConnection();
+                 PreparedStatement pstmt =
+                         connection.prepareStatement("UPDATE reports SET status=3 WHERE timestamp <= ? AND status=0")) {
+
+                pstmt.setLong(1, System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(30));
+                pstmt.execute();
+
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+        }), 1, 30, TimeUnit.SECONDS);
+
     }
 
     @Override

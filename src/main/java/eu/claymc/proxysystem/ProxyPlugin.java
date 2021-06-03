@@ -6,25 +6,20 @@ import eu.claymc.proxysystem.database.SQLDatabase;
 import eu.claymc.proxysystem.listener.PunishChatListener;
 import eu.claymc.proxysystem.listener.PunishLeaveListener;
 import eu.claymc.proxysystem.listener.PunishLoginListener;
+import eu.claymc.proxysystem.listener.TimeOutListener;
 import eu.claymc.proxysystem.notifier.ANotifierManager;
 import eu.claymc.proxysystem.notifier.PermissionBasedNotifierManager;
 import eu.claymc.proxysystem.punish.IPunishManager;
 import eu.claymc.proxysystem.punish.sql.SQLPunishManager;
 import eu.claymc.proxysystem.report.IReportManager;
 import eu.claymc.proxysystem.report.sql.SQLReportManager;
-import eu.thesimplecloud.api.CloudAPI;
-import eu.thesimplecloud.api.message.IMessageChannel;
-import eu.thesimplecloud.api.player.IOfflineCloudPlayer;
+import eu.claymc.proxysystem.timeout.ITimeoutManager;
+import eu.claymc.proxysystem.timeout.SimpleTimeoutManager;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class ProxyPlugin extends Plugin {
 
@@ -36,10 +31,16 @@ public class ProxyPlugin extends Plugin {
         executor.execute(runnable);
     }
 
+    private static Plugin plugin;
+
+    public static Plugin getInstance() {
+        return plugin;
+    }
+
 
     @Override
     public void onEnable() {
-
+        plugin = this;
         IDatabase<Connection> database = new SQLDatabase();
         database.connect();
 
@@ -51,6 +52,8 @@ public class ProxyPlugin extends Plugin {
         IPunishManager punishManager = new SQLPunishManager(database, punishNotifier);
 
         IReportManager reportManager = new SQLReportManager(database, punishNotifier);
+
+        ITimeoutManager timeoutManager = new SimpleTimeoutManager();
 
         getProxy().getPluginManager().registerCommand(this, new TeamChatCommand(teamChatNotifier));
 
@@ -70,37 +73,8 @@ public class ProxyPlugin extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new PInfoCommand(punishManager, database));
 
-
-
-        //auto close reports
-        getProxy().getScheduler().schedule(this, () -> executor.execute(() -> {
-
-            try (Connection connection = database.getConnection();
-                 PreparedStatement pstmt =
-                         connection.prepareStatement("UPDATE reports SET status=3 WHERE timestamp <= ? AND status=0")) {
-
-                pstmt.setLong(1, System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(30));
-                pstmt.execute();
-
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-
-        }), 1, 30, TimeUnit.SECONDS);
-
-        IMessageChannel<String> messageChannel = CloudAPI.getInstance().getMessageChannelManager().registerMessageChannel(CloudAPI.getInstance().getThisSidesCloudModule(), "punish-cache-update", String.class);
-
-        messageChannel.registerListener((s, iNetworkComponent) -> {
-
-            try {
-                System.out.println("messageing channel clear cache listener!");
-                IOfflineCloudPlayer target = CloudAPI.getInstance().getCloudPlayerManager().getOfflineCloudPlayer(UUID.fromString(s)).get();
-                punishManager.clearCache(target);
-                punishManager.getPunishCachedEntries(target);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        getProxy().getPluginManager().registerCommand(this, new TimeoutCommand(timeoutManager));
+        getProxy().getPluginManager().registerListener(this, new TimeOutListener(timeoutManager));
 
     }
 }
